@@ -1,3 +1,5 @@
+pub mod chebyshev;
+
 #[cfg(test)]
 mod tests {
     #[test]
