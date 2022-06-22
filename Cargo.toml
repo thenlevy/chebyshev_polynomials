@@ -1,0 +1,7 @@
+[package]
+name = "chebyshev_polynomials"
+version = "0.1.0"
+edition = "2021"
+authors = ["thenlevy <nicolaspierrelevy@gmail.com>"]
+
+[dependencies]
