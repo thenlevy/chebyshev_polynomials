@@ -1,4 +1,8 @@
-pub mod chebyshev;
+pub(crate) mod chebyshev;
+pub use chebyshev::*;
+pub mod interpolation;
+
+pub use interpolation::*;
 
 #[cfg(test)]
 mod tests {

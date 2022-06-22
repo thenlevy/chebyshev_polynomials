@@ -8,7 +8,7 @@ pub struct ChebyshevPolynomial {
     ///
     /// If coeffs is empty, `self` represents the null polynomial.
     pub coeffs: Vec<f64>,
-    definition_interval: [f64; 2],
+    pub(crate) definition_interval: [f64; 2],
 }
 
 impl ChebyshevPolynomial {
