@@ -31,17 +31,29 @@ where
 /// If points has length 1, return a constant polynomial equal to the value of the function at this
 /// point
 pub fn interpolate_points(point_values: Vec<(f64, f64)>, error_max: f64) -> ChebyshevPolynomial {
-    let function = LinearInterpolator::init(point_values.clone()).into_function();
-    let points_for_error_eval: Vec<f64> = point_values.into_iter().map(|p| p.0).collect();
-    let min = points_for_error_eval
-        .iter()
-        .min_by(|x, y| x.partial_cmp(y).unwrap_or(std::cmp::Ordering::Equal))
-        .unwrap();
-    let max = points_for_error_eval
-        .iter()
-        .max_by(|x, y| x.partial_cmp(y).unwrap_or(std::cmp::Ordering::Equal))
-        .unwrap();
-    interpolate_fun(function, *min, *max, error_max, points_for_error_eval)
+    if point_values.is_empty() {
+        ChebyshevPolynomial {
+            coeffs: vec![],
+            definition_interval: [-1., 1.],
+        }
+    } else if point_values.len() == 1 {
+        ChebyshevPolynomial {
+            coeffs: vec![point_values[0].1],
+            definition_interval: [-1., 1.],
+        }
+    } else {
+        let function = LinearInterpolator::init(point_values.clone()).into_function();
+        let points_for_error_eval: Vec<f64> = point_values.into_iter().map(|p| p.0).collect();
+        let min = points_for_error_eval
+            .iter()
+            .min_by(|x, y| x.partial_cmp(y).unwrap_or(std::cmp::Ordering::Equal))
+            .unwrap();
+        let max = points_for_error_eval
+            .iter()
+            .max_by(|x, y| x.partial_cmp(y).unwrap_or(std::cmp::Ordering::Equal))
+            .unwrap();
+        interpolate_fun(function, *min, *max, error_max, points_for_error_eval)
+    }
 }
 
 struct LinearInterpolator {
