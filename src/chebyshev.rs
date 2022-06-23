@@ -1,5 +1,6 @@
 /// A linear combinations of Chebyshev's polynomials of first kind, defined on an closed interval
 /// of ℝ
+#[derive(Debug, Clone)]
 pub struct ChebyshevPolynomial {
     /// The coefficients of the linear combination.
     ///
@@ -42,6 +43,13 @@ impl ChebyshevPolynomial {
     /// Return the interval on which `self` is defined.
     pub fn definition_interval(&self) -> [f64; 2] {
         self.definition_interval
+    }
+
+    pub fn from_coeffs_interval(coeffs: Vec<f64>, definition_interval: [f64; 2]) -> Self {
+        Self {
+            coeffs,
+            definition_interval,
+        }
     }
 }
 
