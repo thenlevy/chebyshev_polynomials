@@ -2,8 +2,8 @@
 
 use super::chebyshev::*;
 
-const DEGREE_MIN: usize = 5;
-const DEGREE_MAX: usize = 50;
+const DEGREE_MIN: usize = 1;
+const DEGREE_MAX: usize = 100;
 
 /// Interpolate a blackbox function on interval [a, b].
 ///
