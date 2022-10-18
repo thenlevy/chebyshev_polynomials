@@ -164,13 +164,13 @@ impl<F: Fn(f64) -> f64> FunctionInterpolator<F> {
         let matrix = self.matrix_standard[degree]
             .get_or_insert_with(|| Self::init_matrix(&Self::init_space(degree), degree));
 
-        for i in 0..=degree {
+        (0..=degree).for_each(|i| {
             let mut c = 0f64;
-            for j in 0..=degree {
+            (0..=degree).for_each(|j| {
                 c += matrix[i][j] * interpolation_values[j];
-            }
+            });
             self.polynomial.coeffs[i] = 2. * c / (degree as f64 + 1.);
-        }
+        });
         self.polynomial.coeffs[0] /= 2.
     }
 
@@ -191,15 +191,14 @@ impl<F: Fn(f64) -> f64> FunctionInterpolator<F> {
     fn init_matrix(points: &[f64], degree: usize) -> Vec<Vec<f64>> {
         let mut ret = vec![vec![1.; points.len()]; degree + 1];
 
-        for i in 0..points.len() {
+        (0..points.len()).for_each(|i| {
             ret[0][1] = 1.;
             ret[1][i] = points[i];
-        }
+        });
 
         for j in 2..=degree {
-            for i in 0..points.len() {
-                ret[j][i] = 2. * points[i] * ret[j - 1][i] - ret[j - 2][i]
-            }
+            (0..points.len())
+                .for_each(|i| ret[j][i] = 2. * points[i] * ret[j - 1][i] - ret[j - 2][i]);
         }
         ret
     }
@@ -238,7 +237,7 @@ mod test {
 
     #[test]
     fn interpolate_blackbox() {
-        let f = Box::new(|x: f64| fun_to_interpolate(x));
+        let f = Box::new(fun_to_interpolate);
         let points_for_error_eval = (0..1_000).map(|n| 20. * n as f64 / 1_000. - 10.).collect();
         let poly = interpolate_fun(f, -10., 10., 1e-4, points_for_error_eval);
 

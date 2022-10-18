@@ -15,7 +15,7 @@ pub struct ChebyshevPolynomial {
 impl ChebyshevPolynomial {
     /// Evaluate `self` at `t`.
     pub fn evaluate(&self, t: f64) -> f64 {
-        if self.coeffs.len() == 0 {
+        if self.coeffs.is_empty() {
             0.
         } else if self.coeffs.len() == 1 {
             self.coeffs[0]
