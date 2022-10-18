@@ -1,6 +1,7 @@
 //! Methods to build Chebychev's polynomials that approximate functions.
 
 use super::chebyshev::*;
+use rayon::prelude::*;
 
 const DEGREE_MIN: usize = 1;
 const DEGREE_MAX: usize = 100;
@@ -17,7 +18,7 @@ pub fn interpolate_fun<F>(
     points_for_error_eval: Vec<f64>,
 ) -> ChebyshevPolynomial
 where
-    F: Fn(f64) -> f64,
+    F: Fn(f64) -> f64 + Send + Sync,
 {
     FunctionInterpolator::init(a, b, f).fit(error_max, points_for_error_eval)
 }
@@ -95,7 +96,7 @@ impl LinearInterpolator {
     }
 }
 
-struct FunctionInterpolator<F: Fn(f64) -> f64> {
+struct FunctionInterpolator<F: Fn(f64) -> f64 + Send + Sync> {
     f: Box<F>,
     bottom_interval: f64,
     top_interval: f64,
@@ -104,7 +105,7 @@ struct FunctionInterpolator<F: Fn(f64) -> f64> {
     matrix_standard: Vec<Option<Vec<Vec<f64>>>>,
 }
 
-impl<F: Fn(f64) -> f64> FunctionInterpolator<F> {
+impl<F: Fn(f64) -> f64 + Send + Sync> FunctionInterpolator<F> {
     fn init(a: f64, b: f64, f: Box<F>) -> Self {
         Self {
             f,
@@ -120,12 +121,17 @@ impl<F: Fn(f64) -> f64> FunctionInterpolator<F> {
     }
 
     fn error_max(&self, points: &[f64]) -> f64 {
-        let mut ret = 0f64;
-        for x in points.iter() {
-            let err = (self.polynomial.evaluate(*x) - (self.f)(*x)).abs();
-            ret = ret.max(err);
-        }
-        ret
+        points
+            .par_iter()
+            .map(|x| (self.polynomial.evaluate(*x) - (self.f)(*x)).abs())
+            .max_by(|a, b| {
+                if a < b {
+                    std::cmp::Ordering::Less
+                } else {
+                    std::cmp::Ordering::Greater
+                }
+            })
+            .unwrap_or(std::f64::INFINITY)
     }
 
     fn fit(mut self, error_max: f64, points_for_error_eval: Vec<f64>) -> ChebyshevPolynomial {
