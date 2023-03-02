@@ -4,7 +4,7 @@ use super::chebyshev::*;
 use rayon::prelude::*;
 
 const DEGREE_MIN: usize = 1;
-const DEGREE_MAX: usize = 100;
+const DEGREE_MAX: usize = 1000;
 
 /// Interpolate a blackbox function on interval [a, b].
 ///
